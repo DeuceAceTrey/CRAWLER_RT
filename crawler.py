@@ -6,20 +6,14 @@ from time import sleep
 from selenium.webdriver.chrome.service import Service
 import chromedriver_autoinstaller
 from webdriver_manager.chrome import ChromeDriverManager
-import sshtunnel 
 from getFromDB import insertDocument
 from getFromDB import getAllHrefs
 from getFromDB import insertDocument
-from getFromDB import removeTargetUrl
 from getFromDB import getAllTargets
 import threading
 import pytz
 from datetime import datetime
-try:
-    from urllib import unquote
-except ImportError:
-    from urllib.parse import unquote
-from pyvirtualdisplay import Display
+# from pyvirtualdisplay import Display
 from extractor_phone_email import extractor
 
 DEPTH = 20
@@ -104,7 +98,7 @@ def search(st,en,df,driver):
 
 def main():
     if(__name__ == '__main__'):
-        with Display():
+        # with Display():
             chrome_options = uc.ChromeOptions()
             chrome_options.add_argument('--disable-gpu')
             # chrome_options.add_argument('--headless')
@@ -116,12 +110,12 @@ def main():
             chrome_options.add_experimental_option("prefs", prefs)
     
             print("Starting first chrome driver")
-            driver_1 = uc.Chrome(service=Service(chromedriver_autoinstaller.install()),option=chrome_options)
+            driver_1 = uc.Chrome(service=Service(ChromeDriverManager.install),option=chrome_options)
     
             # driver_1.delete_all_cookies()
             # driver_1.maximize_window()
             # print("Starting second chrome driver")
-            driver_2 = webdriver.Chrome(service=Service(chromedriver_autoinstaller.install()))
+            driver_2 = webdriver.Chrome(service=Service(ChromeDriverManager.install))
     
             # driver_2.delete_all_cookies()
             # driver_2.maximize_window()
