@@ -9,7 +9,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 import sshtunnel 
 from getFromDB import insertDocument
 from getFromDB import getAllHrefs
-from getFromDB import insertTargetUrl
+from getFromDB import insertDocument
 from getFromDB import removeTargetUrl
 from getFromDB import getAllTargets
 import threading
@@ -19,7 +19,7 @@ try:
     from urllib import unquote
 except ImportError:
     from urllib.parse import unquote
-# from pyvirtualdisplay import Display
+from pyvirtualdisplay import Display
 from extractor_phone_email import extractor
 
 DEPTH = 20
@@ -104,7 +104,7 @@ def search(st,en,df,driver):
 
 def main():
     if(__name__ == '__main__'):
-        # with Display():
+        with Display():
             chrome_options = uc.ChromeOptions()
             chrome_options.add_argument('--disable-gpu')
             # chrome_options.add_argument('--headless')
@@ -126,7 +126,6 @@ def main():
             # driver_2.delete_all_cookies()
             # driver_2.maximize_window()
             # file_path = input("Please insert search url file path : ")
-            target_urls = ['https://www.ratemds.com/best-doctors/qld/','https://www.ripoffreport.com/reports/specific_search/australia']
             target_urls = getAllTargets()
             
             length = len(target_urls)
@@ -152,13 +151,7 @@ def main():
                     sleep(DELAY_TIME)
 
 
-def insertTarget(target_url):
-    results = insertTargetUrl(target_url)
-    return results
-    
-def removeTarget(target_url):
-    results = removeTargetUrl(target_url)
-    return results
+
         
 
 main()
