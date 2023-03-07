@@ -35,6 +35,7 @@ def getAllUrls(driver,url,d):
         move_url = url    
     print(move_url)
     driver.get(move_url)
+    sleep(30)
     if(move_url not in hrefs and move_url not in inserted_hrefs):
         print("New URL found : " + move_url)
         inserted_hrefs.append(move_url)
@@ -59,6 +60,7 @@ def getAllUrls(driver,url,d):
         phones = ','.join(result['phones'])
         emails = ','.join(result['emails'])
         urls.append({'link' : move_url,'keywords': keywords,'counts' : counts,'phones' : phones,'emails':emails })
+        insertDocument([{'link' : move_url,'keywords': keywords,'counts' : counts,'phones' : phones,'emails':emails }])
     a_tags = driver.find_elements(By.TAG_NAME,'a')
     need_hrefs = []
     for a_tag in a_tags:
@@ -69,7 +71,8 @@ def getAllUrls(driver,url,d):
             except:
                 continue
         if(href != None):
-            if(url in href and href not in new_hrefs and href not in need_hrefs):
+            domain = get_domain_from_url(url)
+            if(domain in href and href not in new_hrefs and href not in need_hrefs):
                 new_hrefs.append(href)
                 need_hrefs.append(href)
             
@@ -96,52 +99,123 @@ def search(st,en,df,driver):
         url = df[i]
         getAllUrls(driver,url,0)
 
+def get_domain_from_url(url):
+    
+    from urllib.parse import urlparse
+    parsed_url = urlparse(url)
+    try:
+        filename = parsed_url.netloc
+    except:
+        # Si falla es porque la implementación de parsed_url no reconoce los atributos como "path"
+        if len(parsed_url)>=4:
+            filename = parsed_url[1]
+        else:
+            filename = ""
+
+    return filename
+
+def init_UC(headers):
+    chrome_options = uc.ChromeOptions()
+    chrome_options.add_argument('--disable-gpu')
+    # chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--window-size=1920,1080')
+    # chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--start-maximized')
+    # chrome_options.add_argument('--disable-setuid-sandbox')
+    headers = {
+    'authority': 'accounts.google.com',
+    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+    'accept-language': 'en-US,en;q=0.9',
+    'cache-control': 'max-age=0',
+    'sec-ch-ua': '"Not?A_Brand";v="8", "Chromium";v="108", "Google Chrome";v="108"',
+    'sec-ch-ua-arch': '"x86"',
+    'sec-ch-ua-bitness': '"64"',
+    'sec-ch-ua-full-version': '"108.0.5359.125"',
+    'sec-ch-ua-full-version-list': '"Not?A_Brand";v="8.0.0.0", "Chromium";v="108.0.5359.125", "Google Chrome";v="108.0.5359.125"',
+    'sec-ch-ua-mobile': '?0',
+    'sec-ch-ua-model': '""',
+    'sec-ch-ua-platform': '"Windows"',
+    'sec-ch-ua-platform-version': '"8.0.0"',
+    'sec-ch-ua-wow64': '?0',
+    'sec-fetch-dest': 'document',
+    'sec-fetch-mode': 'navigate',
+    'sec-fetch-site': 'same-origin',
+    'sec-fetch-user': '?1',
+    'upgrade-insecure-requests': '1',
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
+    'x-chrome-id-consistency-request': 'version=1,client_id=77185425430.apps.googleusercontent.com,device_id=91c169ab-71ab-4040-933c-d2bca9ab8f98,signin_mode=all_accounts,signout_mode=show_confirmation',
+    'x-client-data': 'CLL5ygE=',
+}
+    driver = uc.Chrome(service=Service(chromedriver_autoinstaller.install()),options = chrome_options,headers=headers)
+    return driver
+
 def main():
     if(__name__ == '__main__'):
         # with Display():
             chrome_options = uc.ChromeOptions()
-            chrome_options.add_argument('--disable-gpu')
+            #chrome_options.add_argument('--disable-gpu')
             # chrome_options.add_argument('--headless')
-            chrome_options.add_argument('--window-size=1920,1080')
-            chrome_options.add_argument('--no-sandbox')
-            chrome_options.add_argument('--start-maximized')
-            chrome_options.add_argument('--disable-setuid-sandbox')
-            prefs = {"profile.managed_default_content_settings.images": 2}
-            chrome_options.add_experimental_option("prefs", prefs)
-    
+            #chrome_options.add_argument('--window-size=1920,1080')
+            #chrome_options.add_argument('--no-sandbox')
+            #chrome_options.add_argument('--start-maximized')
+            #chrome_options.add_argument('--disable-setuid-sandbox')
+            #prefs = {"profile.managed_default_content_settings.images": 2}
+            #chrome_options.add_experimental_option("prefs", prefs)
+            # chrome_options.add_argument('--log-level 3') 
+            # chrome_options.add_experimental_option("excludeSwitches", ["enable-logging"])
+            headers = {
+                'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                'accept-encoding': 'gzip, deflate, br',
+                'accept-language': 'en-US,en;q=0.9,ar;q=0.8,zh-CN;q=0.7,zh;q=0.6,ko;q=0.5',
+                'cache-control': 'max-age=0',
+                'referer': 'https://www.ratemds.com/best-doctors/qld/?__cf_chl_tk=BqZuqnT6ucDY5U7LNR5IjS0Wr0.tCwBNrmhpa69pXbg-1678171935-0-gaNycGzNCuU',
+                'sec-ch-ua': '"Chromium";v="110", "Not A(Brand";v="24", "Google Chrome";v="110"',
+                'sec-ch-ua-mobile': '?0',
+                'sec-ch-ua-platform': "Windows",
+                'sec-fetch-dest': 'document',
+                'sec-fetch-mode': 'navigate',
+                'sec-fetch-site': 'same-origin',
+                'sec-fetch-user': '?1',
+                'upgrade-insecure-requests': '1',
+                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36'
+                }
             print("Starting first chrome driver")
-            driver_1 = uc.Chrome(service=Service(ChromeDriverManager.install),option=chrome_options)
+            driver_1 = init_UC(None)
     
             # driver_1.delete_all_cookies()
             # driver_1.maximize_window()
             # print("Starting second chrome driver")
-            driver_2 = webdriver.Chrome(service=Service(ChromeDriverManager.install))
+            # driver_2 = webdriver.Chrome(service=Service(ChromeDriverManager.install))
     
             # driver_2.delete_all_cookies()
             # driver_2.maximize_window()
             # file_path = input("Please insert search url file path : ")
             target_urls = getAllTargets()
+            # domains = []
+            # for target_url in target_urls:
+            #     domains.append(get_domain_from_url(target_url))
             
-            length = len(target_urls)
-            half = int(length/2)
+            
+            #half = int(length/2)
             print("----Running Crawler---")
             while(True):
                 if(True):
                     
                     global hrefs
-                    hrefs = []
                     hrefs = getAllHrefs()
-    
+                    target_urls = getAllTargets()
+                    print(target_urls)
+                    length = len(target_urls)
                     print("Starting Thread 1")
-                    # search(0,half,target_urls,driver_1)
-                    thread_1 = threading.Thread(target=search,args=(0,half,target_urls,driver_1,))
+                    search(0,length,target_urls,driver_1)
+                    #thread_1 = threading.Thread(target=search,args=(0,half,target_urls,driver_1,))
                     print("Starting Thread 2")
-                    thread_2 = threading.Thread(target=search,args=(half,length,target_urls,driver_2,))
-                    thread_1.start()
-                    thread_2.start()
-                    thread_1.join()
-                    thread_2.join()
-                    insertDocument(urls)
+                    #thread_2 = threading.Thread(target=search,args=(half,length,target_urls,driver_2,))
+                    # thread_1.start()
+                    # thread_2.start()
+                    # thread_1.join()
+                    # thread_2.join()
+                    # insertDocument(urls)
                     sleep(DELAY_TIME)
 
 
